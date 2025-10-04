@@ -5,42 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Happy Birthday Kathryn 💫</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      margin: 0;
       height: 100vh;
       background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      flex-direction: column;
       font-family: "Poppins", sans-serif;
       color: #fff;
+      overflow: hidden;
       text-align: center;
       transition: background 1s ease;
     }
 
-    .container {
-      position: relative;
-      z-index: 2;
-      width: 90%;
-      max-width: 800px;
-      padding: 20px;
+    h1 {
+      color: #ffd700;
+      font-size: 1.7em;
+      margin-bottom: 20px;
+      animation: fadeIn 1.5s ease;
     }
 
     .gift {
       width: 110px;
       height: 110px;
       background: gold;
-      border-radius: 10px;
-      margin: 0 auto;
+      border-radius: 12px;
       box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
       cursor: pointer;
+      position: relative;
       animation: float 2s ease-in-out infinite;
     }
 
@@ -58,7 +53,7 @@
     .gift::after {
       content: "";
       position: absolute;
-      top: 12px;
+      top: 10px;
       left: 10px;
       right: 10px;
       height: 10px;
@@ -71,32 +66,22 @@
       50% { transform: translateY(-10px); }
     }
 
-    h1 {
-      font-size: 1.8em;
-      margin-bottom: 25px;
-      color: #ffd700;
-    }
-
     #finalMessage {
       display: none;
-      animation: fadeIn 1.5s ease-in-out;
-    }
-
-    .final-content {
-      display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      text-align: center;
       gap: 1rem;
+      text-align: center;
+      padding: 20px;
+      animation: fadeIn 1.5s ease forwards;
     }
 
     .final-photo img {
-      width: 220px;
+      width: 230px;
       height: auto;
       border-radius: 20px;
-      box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
-      filter: blur(0.3px) brightness(1.05);
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+      filter: brightness(1.1);
       transition: transform 0.6s ease;
     }
 
@@ -105,10 +90,10 @@
     }
 
     .final-text {
-      color: #fff9f0;
+      max-width: 90%;
       font-size: 1rem;
       line-height: 1.6;
-      max-width: 95%;
+      color: #fff8e1;
     }
 
     .final-text h2 {
@@ -121,110 +106,100 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    canvas {
+    /* Confetti emojis */
+    .confetti {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 1;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .confetti span {
+      position: absolute;
+      top: -10%;
+      font-size: 1.2rem;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
     }
 
     @media (min-width: 700px) {
-      .final-content {
-        flex-direction: row;
-        text-align: left;
-      }
-      .final-photo img {
-        width: 260px;
-      }
       .final-text {
         font-size: 1.1rem;
-        max-width: 400px;
+        max-width: 500px;
+      }
+      .final-photo img {
+        width: 280px;
       }
     }
   </style>
 </head>
 <body>
-  <canvas id="confetti"></canvas>
-  <div class="container">
-    <h1>🎁 Tap the Gift, Kathryn 💛</h1>
-    <div class="gift" id="gift"></div>
+  <h1>🎁 Tap the Gift, Kathryn 💛</h1>
+  <div class="gift" id="gift"></div>
 
-    <div id="finalMessage">
-      <div class="final-content">
-        <div class="final-photo">
-          <img src="Kathryn.jpg" alt="Kathryn" />
-        </div>
-        <div class="final-text">
-          <h2>Happy Birthday Kathryn 💖</h2>
-          <p>
-            You shine in ways words can’t capture — bright, calm, and endlessly inspiring. <br>
-            As you step into this new year, may grace open every door, and success follow every step.
-            You deserve the world, Kathryn. <br><br>
-            <em>With all the love in my heart,</em><br>
-            <strong>– Kay 💌</strong>
-          </p>
-        </div>
-      </div>
+  <div id="finalMessage">
+    <div class="final-photo">
+      <img src="Kathryn.jpg" alt="Kathryn" />
+    </div>
+    <div class="final-text" id="messageText">
+      <h2>Happy Birthday Kathryn 💖</h2>
+      <p>
+        You shine in ways words can’t capture — bright, calm, and endlessly inspiring.<br>
+        As you step into this new year, may grace open every door and success follow every step.<br>
+        You deserve the world, Kathryn. <br><br>
+        <em>With all the love in my heart,</em><br>
+        <strong>– Kay 💌</strong>
+      </p>
     </div>
   </div>
 
+  <div class="confetti" id="confetti"></div>
+
   <script>
     const gift = document.getElementById("gift");
+    const title = document.querySelector("h1");
     const finalMessage = document.getElementById("finalMessage");
-    const confettiCanvas = document.getElementById("confetti");
-    const ctx = confettiCanvas.getContext("2d");
-
-    function resizeCanvas() {
-      confettiCanvas.width = window.innerWidth;
-      confettiCanvas.height = window.innerHeight;
-    }
-
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    const confettiPieces = Array.from({ length: 80 }).map(() => ({
-      x: Math.random() * confettiCanvas.width,
-      y: Math.random() * confettiCanvas.height - confettiCanvas.height,
-      r: Math.random() * 5 + 2,
-      d: Math.random() * 0.02 + 0.005,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`,
-    }));
-
-    function drawConfetti() {
-      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-      confettiPieces.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, false);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-      });
-      updateConfetti();
-    }
-
-    function updateConfetti() {
-      confettiPieces.forEach(p => {
-        p.y += p.d * confettiCanvas.height;
-        if (p.y > confettiCanvas.height) {
-          p.y = -10;
-          p.x = Math.random() * confettiCanvas.width;
-        }
-      });
-    }
+    const confetti = document.getElementById("confetti");
+    const messageText = document.getElementById("messageText");
 
     function startConfetti() {
-      let t = setInterval(drawConfetti, 20);
-      setTimeout(() => clearInterval(t), 4000);
+      for (let i = 0; i < 25; i++) {
+        const span = document.createElement("span");
+        span.textContent = ["🎉", "✨", "💛", "🌸", "💫"][Math.floor(Math.random() * 5)];
+        span.style.left = Math.random() * 100 + "%";
+        span.style.animationDuration = (Math.random() * 2 + 3) + "s";
+        confetti.appendChild(span);
+        setTimeout(() => span.remove(), 4000);
+      }
+    }
+
+    function typeWriterEffect(element) {
+      const text = element.innerHTML;
+      element.innerHTML = "";
+      let i = 0;
+      const interval = setInterval(() => {
+        element.innerHTML = text.slice(0, ++i);
+        if (i === text.length) clearInterval(interval);
+      }, 30);
     }
 
     gift.addEventListener("click", () => {
       gift.style.display = "none";
-      document.querySelector("h1").style.display = "none";
-      finalMessage.style.display = "block";
+      title.style.display = "none";
+      finalMessage.style.display = "flex";
       document.body.style.background = "linear-gradient(135deg, #4b2c20, #a47b39, #ffe97f)";
       startConfetti();
+      setTimeout(() => typeWriterEffect(messageText.querySelector("p")), 800);
     });
   </script>
 </body>
